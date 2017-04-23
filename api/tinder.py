@@ -31,7 +31,7 @@ def blueprint(client):
 
     def get_next_user():
         user = client.get_default_database().users.find_one()
-        client.users.update({}, {'$push': {'choosed': user['actual']}})
+        client.get_default_database().users.update({}, {'$push': {'choosed': user['actual']}})
         user = client.get_default_database().users.find_one()
 
         fol = requests.get('https://api.github.com/users/'+user['actual']+'/followers?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
