@@ -6,12 +6,12 @@ class DataGen(object):
         tr_d = []
 
         for i in range(size):
-            arr = [random.uniform(0.0, 1.0) for i in range(5)]
+            arr = [random.uniform(0.0, 1.0) for i in range(23)]
             tr_d.append(arr)
 
 
         #### try
-        training_inputs = [np.reshape(np.array(x), (5, 1)) for x in tr_d]
+        training_inputs = [np.reshape(np.array(x), (23, 1)) for x in tr_d]
         #### ???
 
         training_results = []
