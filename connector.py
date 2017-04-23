@@ -1,4 +1,5 @@
 from nene_copen_v2 import NN
+import nn_gen
 
 nn = None
 
@@ -8,6 +9,10 @@ ENTRY_TABLES = ['TypeScript', 'Java', 'ApacheConf', 'JavaScript', 'Makefile',
 
 def start():
     nn = NN([5, 30, 2])
+    t = nn_gen.DataGen()
+    data = t.gen(3000)
+    nn.gradientDescent(data, 30, 5, 3.0)
+    print "NN entranada"
 
 def transform_langs(langs):
     res = []

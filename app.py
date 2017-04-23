@@ -20,3 +20,4 @@ if __name__ == '__main__':
     if os.environ.get('PORT'):
         port = int(os.environ.get('PORT'))
     app.run(debug=True, port=port)
+    print 'App running at '+str(port)
