@@ -30,9 +30,9 @@ def blueprint(client):
         return user
 
     def get_next_user():
-        user = client.copenhacks.users.find_one()
-        client.copenhacks.users.update({}, {'$push': {'choosed': user['actual']}})
-        user = client.copenhacks.users.find_one()
+        user = client.users.find_one()
+        client.users.update({}, {'$push': {'choosed': user['actual']}})
+        user = client.users.find_one()
 
         fol = requests.get('https://api.github.com/users/'+user['actual']+'/followers?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
         followers = []
@@ -52,10 +52,10 @@ def blueprint(client):
         if user['actual'] in omega:
             omega.remove(user['actual'])
 
-        client.copenhacks.users.update({}, {'$set': {'omega': omega}})
+        client.users.update({}, {'$set': {'omega': omega}})
 
         if len(omega) > 0:
-            client.copenhacks.users.update({}, {'$set': {'actual': omega[0]}})
+            client.users.update({}, {'$set': {'actual': omega[0]}})
             return omega[0]
         else:
             return None
