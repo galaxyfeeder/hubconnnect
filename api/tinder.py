@@ -18,7 +18,7 @@ def blueprint(client):
         n = get_next_users()
         return jsonify(get_extra_information_from_logins(n))
 
-    def get_extra_information_from_login(logins):
+    def get_extra_information_from_logins(logins):
         users = []
         for login in logins:
             repos = requests.get('https://api.github.com/users/'+login+'/repos?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
