@@ -69,6 +69,7 @@ def blueprint(client):
                         client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
                         added = True
 
+                user = client.get_default_database().users.find_one()
                 added = False
                 while not added and i < len(omega):
                     if omega[i] in user['actual']:
