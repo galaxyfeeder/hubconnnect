@@ -9,28 +9,31 @@ def blueprint(client):
     @bp.route('/like', methods=['POST', 'GET'])
     def like():
         # TODO train nn to like this user
-        n = get_next_user()
-        return jsonify(get_extra_information_from_login(n))
+        n = get_next_users()
+        return jsonify(get_extra_information_from_logins(n))
 
     @bp.route('/dislike', methods=['POST', 'GET'])
     def dislike():
         # TODO train nn to dislike this user
-        n = get_next_user()
-        return jsonify(get_extra_information_from_login(n))
+        n = get_next_users()
+        return jsonify(get_extra_information_from_logins(n))
 
-    def get_extra_information_from_login(login):
-        repos = requests.get('https://api.github.com/users/'+login+'/repos?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
-        languages = []
-        for repo in repos:
-            languages.append(repo['language'])
-        languages = list(set(languages))
-        if None in languages:
-            languages.remove(None)
-        user = requests.get('https://api.github.com/users/'+login+'?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
-        user['languages'] = languages
-        return user
+    def get_extra_information_from_login(logins):
+        users = []
+        for login in logins:
+            repos = requests.get('https://api.github.com/users/'+login+'/repos?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
+            languages = []
+            for repo in repos:
+                languages.append(repo['language'])
+            languages = list(set(languages))
+            if None in languages:
+                languages.remove(None)
+            user = requests.get('https://api.github.com/users/'+login+'?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
+            user['languages'] = languages
+            users.append(user)
+        return users
 
-    def get_next_user():
+    def get_next_users():
         user = client.get_default_database().users.find_one()
 
         if len(user['actual']) > 0:
