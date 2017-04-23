@@ -56,8 +56,6 @@ def blueprint(client):
             if user['actual'][0] in omega:
                 omega.remove(user['actual'][0])
 
-            client.get_default_database().users.update({}, {'$set': {'omega': omega}})
-
             client.get_default_database().users.update({}, {'$pop': {'actual': -1}})
             if len(omega) > 0:
                 added = False
@@ -67,6 +65,7 @@ def blueprint(client):
                         i += 1
                     else:
                         client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
+                        omega.remove(i)
                         added = True
 
                 user = client.get_default_database().users.find_one()
@@ -77,7 +76,10 @@ def blueprint(client):
                     else:
                         if len(user['actual']) < 3 and len(omega) > 3-len(user['actual']):
                             client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
+                            omega.remove(i)
                         added = True
+
+            client.get_default_database().users.update({}, {'$set': {'omega': omega}})
 
             user = client.get_default_database().users.find_one()
             if len(user['actual']) > 0:
