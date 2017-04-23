@@ -62,16 +62,16 @@ def blueprint(client):
             if len(omega) > 0:
                 added = False
                 i = 0
-                while not added:
-                    if i < len(omega) and omega[i] in user['actual']:
+                while not added and i < len(omega):
+                    if omega[i] in user['actual']:
                         i += 1
                     else:
                         client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
                         added = True
 
                 added = False
-                while not added:
-                    if i < len(omega) and omega[i] in user['actual']:
+                while not added and i < len(omega):
+                    if omega[i] in user['actual']:
                         i += 1
                     else:
                         if len(user['actual']) < 3 and len(omega) > 3-len(user['actual']):
