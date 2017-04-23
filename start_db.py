@@ -8,3 +8,5 @@ client.copenhacks.users.insert_one({
     'choosed': [],
     'omega': []
 })
+
+client.close()
