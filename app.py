@@ -4,7 +4,7 @@ from api import tinder
 import os
 
 # mongo client
-client = MongoClient()
+client = MongoClient(os.environ.get('MONGODB_URI'))
 
 # flask app
 app = Flask(__name__)
