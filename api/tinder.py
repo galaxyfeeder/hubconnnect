@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify
 import requests
 import random
+import os
 
 def blueprint(client):
     bp = Blueprint('tinder', __name__)
