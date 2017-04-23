@@ -3,14 +3,17 @@ import random
 
 class NN(object):
     def __init__(self, sizesArray):
+        # [inputLayerSize, hiddenLayerSize, outputLayerSize]
         self.sizesArray = sizesArray
         self.numLayers = len(self.sizesArray)
+        # Initialize weights and biases with normal distribution
         self.weights = [np.random.randn(y, x) for x, y in zip(sizesArray[:-1], sizesArray[1:])]
         self.biases = [np.random.randn(y, 1) for y in sizesArray[1:]]
         self.lastsamplingrate = None
 
 
     def forward(self, X):
+        # Computes layer-layer activation: activation = (input vector * layer weights) + biases
         wat = np.reshape(np.array(X), (self.sizesArray[0], 1))
         for b, w in zip(self.biases, self.weights):
             wat = self.sigmoid(np.dot(w, wat) + b)
@@ -36,27 +39,17 @@ class NN(object):
         J = 0.5*sum((y-self.yHat)**2)
         return J
 
-    #def costPrime(self, X, y):                 _deprecated_
-        #self.yHat = self.forward(X)
-
-        #delta3 = np.multiply(-(y - self.yHat), self.sigmoidPrime(self.Z3))
-        #dJdW2 = np.dot(self.a2.T, delta3)
-
-        #delta2 = np.dot(delta3, self.W2.T)      # W2.T es la transposada
-        #dJdW1 = np.dot(X.T, delta2)
-
-        #return dJdW1, dJdw2
-
-
     def gradientDescent(self, trainingData, stages, batchSize, samplingRate):
         self.lastsamplingrate = samplingRate
         n = len(trainingData)
         for j in xrange(stages):
             random.shuffle(trainingData)
+            # Use chunks of data
             batchesArray = [trainingData[k:k+batchSize] for k in xrange(0, n, batchSize)]
             for bat in batchesArray:
+                # Update the weights
                 self.updateBatch(bat, samplingRate)
-            print "Stage", j, "of", stages, "..."
+            #print "Stage", j, "of", stages, "..."
 
 
     # Update network weight with backprop
@@ -125,28 +118,23 @@ class NN(object):
         resultArray = [(np.argmax(self.forward(x)), y) for (x, y) in dataToTest]
         return sum(int(x == y) for (x, y) in resultArray)
 
-    def testDebug(self, arrayToTest, submitChanges = False):
-        forwarding = self.forward(arrayToTest)
-        print forwarding
-        maximumArg = np.argmax(forwarding)
-
+    def getAnswer(self, arrayToTest):
         # Remember that, when testing, we specify the index of the 2-pos output vector:
         # a '0' means neurone 0 -> would hire, and '1' means neurone 1 -> would not
 
-        if maximumArg == 0:
-            print 'Y'
+        if np.argmax(self.forward(arrayToTest)) == 0:
+            return True
         else:
-            print 'N'
-        print "----------------\n"
-        gotcha = raw_input("Did the user like the candidate (y/n)? ")
+            print False
 
-        if gotcha.lower() == 'y':
-            batSubmit = [np.reshape(np.array(arrayToTest), (self.sizesArray[0], 1)), np.reshape(np.array([1, 0]), (self.sizesArray[-1], 1))]
+    def correct(self, profileInfo, flag):
+        if (flag):
+            batSubmit = [np.reshape(np.array(profileInfo), (self.sizesArray[0], 1)), np.reshape(np.array([1, 0]), (self.sizesArray[-1], 1))]
         else:
-            batSubmit = [np.reshape(np.array(arrayToTest), (self.sizesArray[0], 1)), np.reshape(np.array([0, 1]), (self.sizesArray[-1], 1))]
+            batSubmit = [np.reshape(np.array(profileInfo), (self.sizesArray[0], 1)), np.reshape(np.array([0, 1]), (self.sizesArray[-1], 1))]
 
-        if submitChanges:
-            self.batchFeedback(batSubmit)
+        self.batchFeedback(batSubmit)
+
 
     def debugPrintStateToFile(self, filename):
         f = open(str(filename), "a")
