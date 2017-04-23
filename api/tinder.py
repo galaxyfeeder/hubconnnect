@@ -32,33 +32,51 @@ def blueprint(client):
 
     def get_next_user():
         user = client.get_default_database().users.find_one()
-        client.get_default_database().users.update({}, {'$push': {'choosed': user['actual']}})
-        user = client.get_default_database().users.find_one()
 
-        fol = requests.get('https://api.github.com/users/'+user['actual']+'/followers?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
-        followers = []
-        for f in fol:
-            if f['login'] != user['actual'] and f['login'] not in user['choosed']:
-                followers.append(f['login'])
-        omega = list(set(user['omega'] + followers))
+        if len(user['actual']) > 0:
+            client.get_default_database().users.update({}, {'$push': {'choosed': user['actual'][0]}})
+            user = client.get_default_database().users.find_one()
 
-        for u in omega:
-            # TODO ask to the nn if its valid or not
-            valid = bool(random.getrandbits(1))
-            if valid:
-                pass
-            else:
-                omega.remove(u)
+            fol = requests.get('https://api.github.com/users/'+user['actual'][0]+'/followers?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
+            followers = []
+            for f in fol:
+                if f['login'] != user['actual'][0] and f['login'] not in user['choosed']:
+                    followers.append(f['login'])
+            omega = list(set(user['omega'] + followers))
 
-        if user['actual'] in omega:
-            omega.remove(user['actual'])
+            for u in omega:
+                # TODO ask to the nn if its valid or not
+                valid = bool(random.getrandbits(1))
+                if not valid:
+                    omega.remove(u)
 
-        client.get_default_database().users.update({}, {'$set': {'omega': omega}})
+            if user['actual'][0] in omega:
+                omega.remove(user['actual'][0])
 
-        if len(omega) > 0:
-            client.get_default_database().users.update({}, {'$set': {'actual': omega[0]}})
-            return omega[0]
-        else:
-            return None
+            client.get_default_database().users.update({}, {'$set': {'omega': omega}})
+
+            client.get_default_database().users.update({}, {'$pop': {'actual': -1}})
+            if len(omega) > 0:
+                added = False
+                i = 0
+                while not added:
+                    if omega[i] in user['actual']:
+                        i += 1
+                    else:
+                        client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
+                        added = True
+                
+                added = False
+                while not added:
+                    if omega[i] in user['actual']
+                        i += 1
+                    else:
+                        if len(user['actual']) < 3 and len(omega) > 3-len(user['actual']):
+                            client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
+
+            user = client.get_default_database().users.find_one()
+            if len(user['actual']) > 0:
+                return user['actual']
+        return []
 
     return bp

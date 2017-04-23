@@ -3,7 +3,7 @@ import os
 
 client = MongoClient(os.environ.get('MONGODB_URI'))
 
-client.copenhacks.users.insert_one({
+client.get_default_database().users.insert_one({
     'actual': 'galaxyfeeder',
     'genesis': 'galaxyfeeder',
     'choosed': [],
