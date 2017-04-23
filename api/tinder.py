@@ -43,7 +43,7 @@ def blueprint(client):
             fol = requests.get('https://api.github.com/users/'+user['actual'][0]+'/followers?client_id='+os.environ.get('CLIENT_ID')+'&client_secret='+os.environ.get('CLIENT_SECRET')).json()
             followers = []
             for f in fol:
-                if f['login'] != user['actual'][0] and f['login'] not in user['choosed']:
+                if f['login'] not in user['actual'] and f['login'] not in user['choosed']:
                     followers.append(f['login'])
             omega = list(set(user['omega'] + followers))
 
