@@ -73,6 +73,7 @@ def blueprint(client):
                     else:
                         if len(user['actual']) < 3 and len(omega) > 3-len(user['actual']):
                             client.get_default_database().users.update({}, {'$push': {'actual': omega[i]}})
+                        added = True
 
             user = client.get_default_database().users.find_one()
             if len(user['actual']) > 0:
