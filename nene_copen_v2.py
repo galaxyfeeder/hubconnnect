@@ -52,7 +52,7 @@ class NN(object):
             #print "Stage", j, "of", stages, "..."
 
 
-    # Update network weight with backprop
+    # Update network weight with backprop, deal with matrices
     def updateBatch(self, bat, samp):
         nablaB = [np.zeros(b.shape) for b in self.biases]           # nabla = "inverted Delta", "gradient"
         nablaW = [np.zeros(w.shape) for w in self.weights]
@@ -70,7 +70,7 @@ class NN(object):
 
         for x, y in bat:
             deltaNablaB, deltaNablaW = self.backprop(x, y)          # partial derivatives
-            nablaB = [nb + dnb for nb, dnb in zip(nablaB, deltaNablaB)]
+            nablaB = [nb + dnb for nb, dnb in zip(nablaB, deltaNablaB)]     # we add the little deviation
             nablaW = [nw + dnw for nw, dnw in zip(nablaW, deltaNablaW)]
         self.weights = [w - (samp/len(bat))*nw for w, nw in zip(self.weights, nablaW)]
         self.biases  = [b - (samp/len(bat))*nb for b, nb in zip(self.biases, nablaB)]
@@ -81,7 +81,7 @@ class NN(object):
         nablaB = [np.zeros(b.shape) for b in self.biases]
         nablaW = [np.zeros(w.shape) for w in self.weights]
 
-        deltaNablaB, deltaNablaW = self.backprop(bat[0], bat[1])          # partial derivatives
+        deltaNablaB, deltaNablaW = self.backprop(bat[0], bat[1])          # more corrections
         nablaB = [nb + dnb for nb, dnb in zip(nablaB, deltaNablaB)]
         nablaW = [nw + dnw for nw, dnw in zip(nablaW, deltaNablaW)]
         self.weights = [w - (samp/len(bat))*nw for w, nw in zip(self.weights, nablaW)]
@@ -89,6 +89,8 @@ class NN(object):
 
 
     def backprop(self, x, y):
+        # returns the gradient vector for the cost function
+        # older weights get adjusted based on the activity of the next layers
         nablaW = [np.zeros(w.shape) for w in self.weights]
         nablaB = [np.zeros(b.shape) for b in self.biases]
         act = x
@@ -106,7 +108,7 @@ class NN(object):
         nablaB[-1] = delta
         nablaW[-1] = np.dot(delta, actArray[-2].transpose())
 
-        for l in xrange(2, self.numLayers):
+        for l in xrange(2, self.numLayers): # since we have 3 layers it will only run 1 iteration
             z = zArray[-l]
             sPrime = self.sigmoidPrime(z)
             delta = np.dot(self.weights[-l + 1].transpose(), delta) * sPrime
@@ -125,7 +127,7 @@ class NN(object):
         if np.argmax(self.forward(arrayToTest)) == 0:
             return True
         else:
-            print False
+            return False
 
     def correct(self, profileInfo, flag):
         if (flag):
