@@ -125,7 +125,7 @@ class NN(object):
         if np.argmax(self.forward(arrayToTest)) == 0:
             return True
         else:
-            print False
+            return False
 
     def correct(self, profileInfo, flag):
         if (flag):
